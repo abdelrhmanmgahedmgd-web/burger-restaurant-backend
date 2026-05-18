@@ -36,19 +36,29 @@ app.MapPost("/api/orders", async (Order newOrder, OrderContext db) => {
 });
 
 
-app.MapGet("/api/orders", async (OrderContext db) => {
-    var kitchenOrders = await db.Orders.Where(o => o.IsDone == false).ToListAsync();
-    return Results.Ok(kitchenOrders);
+app.MapGet("/api/orders", async (OrderContext db) =>
+{
+    var activeOrders = await db.Orders.Where(o => o.IsDone == false).ToListAsync();
+    return Results.Ok(activeOrders);
 });
 
-
-app.MapDelete("/api/orders/{id}", async (int id, OrderContext db) => {
+app.MapPut("/api/orders/{id}/ready", async (int id, OrderContext db) =>{
     var order = await db.Orders.FindAsync(id);
-    if (order == null) return Results.NotFound();
-
-    order.IsDone = true; 
+    if (order is null) return Results.NotFound();
+    
+    order.IsReady = true;
     await db.SaveChangesAsync();
-    return Results.Ok(new { message = "تم إنجاز الأوردر ونقله للأرشيف التاريخي! ✅" });
+    return Results.Ok(new { message = "تم تجهيز الأوردر ونقله للكاشير ✔" });
+});
+
+app.MapDelete("/api/orders/{id}", async (int id, OrderContext db) =>
+{
+    var order = await db.Orders.FindAsync(id);
+    if (order is null) return Results.NotFound();
+
+    order.IsDone = true;
+    await db.SaveChangesAsync();
+    return Results.Ok(new { message = "تم تسليم الأوردر ونقله لأرشيف التاريخي 📦" });
 });
 
 app.MapGet("/api/vault", async (OrderContext db) => {
@@ -78,4 +88,6 @@ public class Order
     public double Price { get; set; }
     public DateTime OrderDate { get; set; }
     public bool IsDone { get; set; } 
+    public bool IsReady { get; set; } = false;
 }
+
