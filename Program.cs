@@ -88,6 +88,6 @@ public class Order
     public double Price { get; set; }
     public DateTime OrderDate { get; set; }
     public bool IsDone { get; set; } 
-    public bool IsReady { get; set; } = false;
+    public bool IsReady { get; set; } ;
 }
 
