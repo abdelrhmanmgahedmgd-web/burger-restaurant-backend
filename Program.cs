@@ -8,8 +8,19 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<OrderContext>(options =>
     options.UseSqlite("Data Source=orders.db"));
 
-var app = builder.Build();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowGitHubPages",
+        policy =>
+        {
+            policy.WithOrigins("https://abdelrhmanmgahedmgd-web.github.io")                 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
+var app = builder.Build();
+app.UseCors("AllowGitHubPages");
 app.UseCors(policy => policy.AllowAnyHeader()
                            .AllowAnyMethod()
                            .AllowAnyOrigin());
